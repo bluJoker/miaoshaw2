@@ -5,7 +5,9 @@ import com.miaoshaproject.dao.ItemStockDOMapper;
 import com.miaoshaproject.dataObject.ItemDO;
 import com.miaoshaproject.dataObject.ItemStockDO;
 import com.miaoshaproject.service.ItemService;
+import com.miaoshaproject.service.PromoService;
 import com.miaoshaproject.service.model.ItemModel;
+import com.miaoshaproject.service.model.PromoModel;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Autowired
     private ItemStockDOMapper itemStockDOMapper;
+
+    @Autowired
+    private PromoService promoService;
 
     private ItemDO convertItemDOFromItemModel(ItemModel itemModel){
         if (itemModel == null){
@@ -97,6 +102,13 @@ public class ItemServiceImpl implements ItemService {
 
         // 将dataObject->model
         ItemModel itemModel = convertModelFromDataObject(itemDO, itemStockDO);
+
+        // 获取秒杀活动商品信息
+        PromoModel promoModel = promoService.getPromoByItemId(itemModel.getId());
+        // 显示即将开始或已开始的秒杀信息
+        if (promoModel != null && promoModel.getStatus().intValue() != 3){
+            itemModel.setPromoModel(promoModel);
+        }
 
         return itemModel;
     }
