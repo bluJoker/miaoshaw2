@@ -8,7 +8,7 @@
     <link href="static/assets/global/css/components.css" rel="stylesheet" type="text/css"></link>
     <link href="static/assets/admin/pages/css/login.css" rel="stylesheet" type="text/css"></link>
 
-    <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/jquery/1.10.0/jquery.min.js"></script>
+    <script type="text/javascript" src="static/assets/global/plugins/jquery-1.11.0.min.js"></script>
 </head>
 
 <body class="login">
@@ -31,6 +31,7 @@
 </body>
 
 <script>
+    //jQuery的动态绑定元素必须要在document里面来完成，只有等页面document渲染成功之后才能执行对应的操作
     jQuery(document).ready(function(){
 
         //绑定otp的click事件用于向后端发送获取手机验证码的请求

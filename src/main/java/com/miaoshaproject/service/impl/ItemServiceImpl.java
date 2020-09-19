@@ -67,6 +67,8 @@ public class ItemServiceImpl implements ItemService {
 
         // 写入数据库
         itemDOMapper.insertSelective(itemDO);
+
+        // TODO:?????为什么需要设置id?因为前端页面没有传入id，插入数据库之后会有id，将其设置到ItemModel中
         itemModel.setId(itemDO.getId());
 
         ItemStockDO itemStockDO = this.convertItemStockDOFromItemModel(itemModel);

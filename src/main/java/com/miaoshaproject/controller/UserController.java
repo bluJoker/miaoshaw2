@@ -23,7 +23,7 @@ import java.util.Random;
 @Controller("user")
 @RequestMapping("/user")
 @CrossOrigin(allowCredentials = "true", allowedHeaders = "*")
-public class UserController extends BaseController {
+public class  UserController extends BaseController {
 
     @Autowired
     private UserService userService;
@@ -38,7 +38,7 @@ public class UserController extends BaseController {
                                   @RequestParam(name = "password") String password) throws BusinessException, UnsupportedEncodingException, NoSuchAlgorithmException {
 
         // 入参校验
-        if (org.apache.commons.lang3.StringUtils.isEmpty(telphone) || org.apache.commons.lang3.StringUtils.isEmpty(password)){
+        if (org.apache.commons.lang3.StringUtils.isEmpty(telphone) || org.apache.commons.lang3.StringUtils.isEmpty(password)) {
             throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
         }
 
@@ -53,7 +53,6 @@ public class UserController extends BaseController {
     }
 
 
-
     // 用户注册接口
     @RequestMapping(value = "/register", method = RequestMethod.POST, consumes = CONTENT_TYPE_FORMED)
     @ResponseBody
@@ -63,9 +62,11 @@ public class UserController extends BaseController {
                                      @RequestParam(name = "gender") Byte gender,
                                      @RequestParam(name = "age") Integer age,
                                      @RequestParam(name = "password") String password) throws BusinessException, UnsupportedEncodingException, NoSuchAlgorithmException {
-        //验证手机号和对应的otpCode是否相符合
+        // 验证手机号和对应的otpCode是否相符合
         String inSessionOtpCode = (String) this.httpServletRequest.getSession().getAttribute(telphone);
-        if (!StringUtils.equals(otpCode, inSessionOtpCode)){
+
+        // druid中的StringUtils
+        if (!StringUtils.equals(otpCode, inSessionOtpCode)) {
             throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, "短信验证码错误");
         }
 
@@ -95,7 +96,6 @@ public class UserController extends BaseController {
     }
 
 
-
     //用户获取otp短信接口
     @RequestMapping(value = "/getotp", method = RequestMethod.POST, consumes = CONTENT_TYPE_FORMED)
     @ResponseBody
@@ -109,12 +109,13 @@ public class UserController extends BaseController {
         String otpCode = String.valueOf(randomInt);
 
 
-        // 将OTP验证码同对应用户的手机号关联，使用httpsession的方式绑定他的手机号与OTPCODE
+        // 将OTP验证码同对应用户的手机号关联，使用httpsession的方式绑定他的手机号与otpCode
+        // 后面最好使用redis实现存储该key-value对
         httpServletRequest.getSession().setAttribute(telphone, otpCode);
 
 
         // 将OTP验证码通过短信通道发送给用户，省略
-        System.out.println("telphone=" + telphone + " & otpCode= " + otpCode);
+        System.out.println("telphone= " + telphone + " & otpCode= " + otpCode);
 
         return CommonReturnType.create(null);
     }
@@ -131,7 +132,7 @@ public class UserController extends BaseController {
 //            throw new BusinessException(EmBusinessError.USER_NOT_EXIST);
         }
 
-        //将核心领域模型用户对象转换为可供UI使用的viewobject
+        //将核心领域模型对象转换为可供UI使用的viewobject
         UserVO userVO = convertFromUserModel(userModel);
         return CommonReturnType.create(userVO);
     }

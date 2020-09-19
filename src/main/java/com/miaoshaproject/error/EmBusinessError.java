@@ -36,6 +36,7 @@ public enum EmBusinessError implements CommonError{
         return this.errMsg;
     }
 
+    //作用：通用错误类型10001的errMsg可能在很多地方不一样，故需要一个可以修改errMsg的方法
     @Override
     public CommonError setErrMsg(String errMsg) {
         this.errMsg = errMsg;
