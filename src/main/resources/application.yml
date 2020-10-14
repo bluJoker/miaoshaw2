@@ -1,5 +1,9 @@
 server:
   port: 8090
+#  tomcat:
+#    accept-count: 1000
+#    max-threads: 800
+#    min-spare-threads: 100
 
 mybatis:
   mapper-locations:
