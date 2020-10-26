@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.miaoshaproject.miaosha.controller.viewobject.ItemVO;
 import com.miaoshaproject.miaosha.response.CommonReturnType;
+import com.miaoshaproject.miaosha.service.CacheService;
 import com.miaoshaproject.miaosha.service.ItemService;
 import com.miaoshaproject.miaosha.service.model.ItemModel;
 import org.joda.time.format.DateTimeFormat;
@@ -32,6 +33,9 @@ public class ItemController extends BaseController{
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private CacheService cacheService;
 
 
     // 创建商品的controller
@@ -84,20 +88,28 @@ public class ItemController extends BaseController{
     public CommonReturnType getItem(@RequestParam(name = "id")Integer id) throws JsonProcessingException {
         ItemModel itemModel = null;
 
-        // 根据商品id到redis内获取
-        Object object = redisTemplate.opsForValue().get("item_" + id);
+        // 多级缓存：先取本地缓存，取不到再去redis中取，redis中取不到则取数据库
 
-        // 若redis内不存在对应的itemModel，则访问下游service
-        if (object != null){
-            itemModel = objectMapper.readValue(object.toString(), ItemModel.class);
-        }else {
-            itemModel = itemService.getItemById(id);
+        // 取本地缓存
+        itemModel = (ItemModel) cacheService.getFromCommonCache("item_" + id);
+        if (itemModel == null){
+            // 根据商品id到redis内获取
+            Object object = redisTemplate.opsForValue().get("item_" + id);
 
-            final String content = objectMapper.writeValueAsString(itemModel);
+            // 若redis内不存在对应的itemModel，则访问下游service
+            if (object != null){
+                itemModel = objectMapper.readValue(object.toString(), ItemModel.class);
+            }else {
+                itemModel = itemService.getItemById(id);
 
-            // 设置itemModel到redis内
-            redisTemplate.opsForValue().set("item_" + id, content);
-            redisTemplate.expire("item_" + id, 10, TimeUnit.MINUTES);
+                final String content = objectMapper.writeValueAsString(itemModel);
+
+                // 设置itemModel到redis内
+                redisTemplate.opsForValue().set("item_" + id, content);
+                redisTemplate.expire("item_" + id, 10, TimeUnit.MINUTES);
+            }
+            // redis+数据库->存本地
+            cacheService.setCommonCache("item_" + id, itemModel);
         }
 
         ItemVO itemVO = convertVOFromModel(itemModel);
