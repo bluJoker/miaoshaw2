@@ -1,8 +1,9 @@
 package com.miaoshaproject.miaosha.service.model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class ItemModel {
+public class ItemModel implements Serializable {
     private Integer id;
 
     // 商品名称

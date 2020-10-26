@@ -9,6 +9,7 @@
     <link href="static/assets/admin/pages/css/login.css" rel="stylesheet" type="text/css"></link>
 
     <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/jquery/1.10.0/jquery.min.js"></script>
+    <script type="text/javascript" src="./gethost.js"></script>
 </head>
 
 <body class="login">
@@ -103,7 +104,7 @@
             $.ajax({
                 type: "POST",
                 contentType: "application/x-www-form-urlencoded",
-                url: "http://localhost:8090/user/register",
+                url: "http://"+g_host+"/user/register",
                 data: {
                     "telphone": $("#telphone").val(),
                     "password": password,

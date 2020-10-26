@@ -10,6 +10,7 @@ public enum EmBusinessError implements CommonError{
     USER_NOT_EXIST(20001, "用户不存在"),
     USER_LOGIN_FAIL(20002, "用户名或密码不正确"),
     USER_NOT_LOGIN(20003, "用户未登录"),
+    USER_OTP_SEND_FAIL(20004, "otpCode发送失败"),
 
 
     //30000开头的为交易信息错误

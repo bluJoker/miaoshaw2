@@ -1,10 +1,22 @@
 package com.miaoshaproject.miaosha.controller;
 
 import com.alibaba.druid.util.StringUtils;
+import com.aliyuncs.CommonRequest;
+import com.aliyuncs.CommonResponse;
+import com.aliyuncs.DefaultAcsClient;
+import com.aliyuncs.IAcsClient;
+import com.aliyuncs.exceptions.ClientException;
+import com.aliyuncs.exceptions.ServerException;
+import com.aliyuncs.http.MethodType;
+import com.aliyuncs.profile.DefaultProfile;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.util.JSONPObject;
+import com.google.gson.JsonObject;
 import com.miaoshaproject.miaosha.controller.viewobject.UserVO;
 import com.miaoshaproject.miaosha.error.BusinessException;
 import com.miaoshaproject.miaosha.error.EmBusinessError;
 import com.miaoshaproject.miaosha.response.CommonReturnType;
+import com.miaoshaproject.miaosha.service.SmsService;
 import com.miaoshaproject.miaosha.service.UserService;
 import com.miaoshaproject.miaosha.service.model.UserModel;
 import org.springframework.beans.BeanUtils;
@@ -17,7 +29,9 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
 import java.util.Random;
+import java.util.UUID;
 
 @Controller("user")
 @RequestMapping("/user")
@@ -26,6 +40,9 @@ public class  UserController extends BaseController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private SmsService smsService;
 
     @Autowired
     private HttpServletRequest httpServletRequest;
@@ -98,7 +115,7 @@ public class  UserController extends BaseController {
     //用户获取otp短信接口
     @RequestMapping(value = "/getotp", method = RequestMethod.POST, consumes = CONTENT_TYPE_FORMED)
     @ResponseBody
-    public CommonReturnType getOtp(@RequestParam(name = "telphone") String telphone) {
+    public CommonReturnType getOtp(@RequestParam(name = "telphone") String telphone) throws BusinessException, JsonProcessingException {
         // 需要按照一定的规则生成OTP验证码[0, 99999)
         Random random = new Random();
         int randomInt = random.nextInt(99999);
@@ -107,14 +124,21 @@ public class  UserController extends BaseController {
 
         String otpCode = String.valueOf(randomInt);
 
-
         // 将OTP验证码同对应用户的手机号关联，使用httpsession的方式绑定他的手机号与otpCode
         // 后面最好使用redis实现存储该key-value对
-        httpServletRequest.getSession().setAttribute(telphone, otpCode);
+//        httpServletRequest.getSession().setAttribute(telphone, otpCode);
 
 
-        // 将OTP验证码通过短信通道发送给用户，省略
+        // 将OTP验证码通过短信通道发送给用户
         System.out.println("telphone= " + telphone + " & otpCode= " + otpCode);
+        boolean isSendSuccess = smsService.sendOtpCode(telphone);
+
+        if (isSendSuccess){
+            System.out.println("otp发送成功");
+        }else {
+            System.out.println("otp发送失败");
+            throw new BusinessException(EmBusinessError.USER_OTP_SEND_FAIL);
+        }
 
         return CommonReturnType.create(null);
     }

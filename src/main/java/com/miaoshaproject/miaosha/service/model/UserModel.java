@@ -1,6 +1,8 @@
 package com.miaoshaproject.miaosha.service.model;
 
-public class UserModel {
+import java.io.Serializable;
+
+public class UserModel implements Serializable {
     private Integer id;
     private String name;
     private Byte gender;

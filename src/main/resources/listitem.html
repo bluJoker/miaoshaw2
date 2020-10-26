@@ -9,6 +9,7 @@
     <link href="static/assets/admin/pages/css/login.css" rel="stylesheet" type="text/css"></link>
 
     <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/jquery/1.10.0/jquery.min.js"></script>
+    <script type="text/javascript" src="./gethost.js"></script>
 </head>
 
 <body>
@@ -43,7 +44,7 @@
 
             $.ajax({
                 type: "GET",
-                url: "http://localhost:8090/item/list",
+                url: "http://"+g_host+"/item/list",
 
                 xhrFields: {withCredentials:true},
                 success: function(result){
