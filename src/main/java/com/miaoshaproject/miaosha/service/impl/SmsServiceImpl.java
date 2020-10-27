@@ -35,7 +35,7 @@ public class SmsServiceImpl implements SmsService {
         // 连接阿里云
         DefaultProfile profile = DefaultProfile.getProfile("cn-hangzhou",
                 "LTAI4G5XByxyEaqWKqeq9gjp",
-                "bUXiGW1KR3nTPJ9LUvK6uKhbbLoC25");
+                .....);
         IAcsClient client = new DefaultAcsClient(profile);
 
         // 构建请求
